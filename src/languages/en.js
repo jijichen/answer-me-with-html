@@ -4,6 +4,7 @@ export default {
   language: 'en',
   voice: { say: 'en_US', espeak: 'en-us' },
   ui: {
+    keys: { title: 'Keyboard shortcuts', remark: 'Turn remark mode on or off', reply: 'Comment on this panel, or open the reply', send: 'Save the remark, or copy the reply', next: 'Next panel', prev: 'Previous panel', jump: 'Go to panel 1 to 9', help: 'Show or hide this list' },
     remark: {
       button: 'Remark', need: 'Pick a tag to save',
       hint: 'Optional note', save: 'Save', remove: 'Remove', clear: 'Clear all remarks', clearConfirm: 'Click again to clear {n}',
