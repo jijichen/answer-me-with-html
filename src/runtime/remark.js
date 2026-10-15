@@ -140,7 +140,8 @@
   clearBtn.hidden = marks.size === 0;
   if (marks.size) for (const [el, key] of keyMap()) if (marks.has(key)) paint(el, marks.get(key));
 
-  // The popover edits one block. Save stays off until a kind is picked.
+  // The popover edits one block. Save stays off until a kind is picked, and a hint says so. 1–4 pick a kind from the keyboard and
+  // move to the note. A popover closed without Save keeps its kind and note as a draft for that block until the page reloads.
   const pop = document.createElement('div');
   pop.className = 'am-remark-pop';
   pop.hidden = true;
@@ -149,8 +150,12 @@
   document.body.append(pop);
   let opener = null;
   let anchor = null;
+  const drafts = new Map();
+  let keepDraft = null;
   const close = (restoreFocus) => {
     if (pop.hidden) return;
+    keepDraft?.();
+    keepDraft = null;
     pop.hidden = true;
     if (restoreFocus) (opener?.isConnected && opener !== document.body ? opener : btn).focus();
   };
@@ -167,14 +172,22 @@
   const open = (el) => {
     const key = keyMap().get(el);
     const mark = marks.get(key);
-    let kind = mark?.kind ?? '';
+    const draft = drafts.get(key);
+    let kind = draft?.kind ?? mark?.kind ?? '';
     opener = document.activeElement;
     anchor = el;
 
-    const note = make('textarea', { rows: 2, placeholder: ui.hint, value: mark?.note ?? '' });
+    const note = make('textarea', { rows: 2, placeholder: ui.hint, value: draft?.note ?? mark?.note ?? '' });
     note.setAttribute('aria-label', ui.hint);
     const keep = make('button', { type: 'button', className: 'am-btn', textContent: ui.save, disabled: !kind });
+    const need = make('span', { className: 'am-remark-need', textContent: ui.need, hidden: Boolean(kind) });
+    keepDraft = () => {
+      if (kind || note.value.trim()) drafts.set(key, { kind, note: note.value });
+      else drafts.delete(key);
+    };
+    const done = () => { drafts.delete(key); keepDraft = null; };
     keep.addEventListener('click', () => {
+      done();
       const saved = { key, kind, note: note.value.trim() };
       marks.set(key, saved);
       save();
@@ -186,6 +199,7 @@
     if (mark) {
       const drop = make('button', { type: 'button', className: 'am-btn', textContent: ui.remove });
       drop.addEventListener('click', () => {
+        done();
         marks.delete(key);
         save();
         unpaint(el);
@@ -193,17 +207,28 @@
       });
       actions.append(drop);
     }
-    const kindBtns = KINDS.map((k) => {
+    const choose = (k) => {
+      kind = k;
+      for (const other of kindBtns) other.setAttribute('aria-pressed', String(other.dataset.kind === k));
+      keep.disabled = false;
+      need.hidden = true;
+    };
+    const kindBtns = KINDS.map((k, i) => {
       const kb = make('button', { type: 'button', className: 'am-remark-kind', textContent: ui.kinds[k] });
       kb.dataset.kind = k;
+      kb.dataset.n = i + 1;
       kb.setAttribute('aria-pressed', String(k === kind));
-      kb.addEventListener('click', () => {
-        kind = k;
-        for (const other of kindBtns) other.setAttribute('aria-pressed', String(other === kb));
-        keep.disabled = false;
-      });
+      kb.addEventListener('click', () => choose(k));
       return kb;
     });
+    // A digit types into the note, so it picks a kind only while the focus is outside the note.
+    pop.onkeydown = (e) => {
+      if (e.target === note || e.ctrlKey || e.metaKey || e.altKey || !/^[1-4]$/.test(e.key)) return;
+      e.preventDefault();
+      choose(KINDS[Number(e.key) - 1]);
+      note.focus();
+    };
+    actions.append(need);
     pop.replaceChildren(make('div', { className: 'am-remark-kinds' }), note, actions);
     pop.firstChild.append(...kindBtns);
     pop.hidden = false;
