@@ -6,6 +6,7 @@ export default {
   script: 'Hans',
   voice: { say: 'zh_CN', espeak: 'cmn' },
   ui: {
+    keys: { title: '快捷键', remark: '打开或关闭标注模式', reply: '评论当前面板，或打开回复', send: '保存标注，或复制回复', next: '下一个面板', prev: '上一个面板', jump: '跳到第 1 至 9 个面板', help: '显示或隐藏本列表' },
     remark: {
       button: '标注', need: '选择标签后才能保存',
       hint: '批注（可选）', save: '保存', remove: '删除', clear: '清除所有标注', clearConfirm: '再次点击以清除 {n} 条标注',

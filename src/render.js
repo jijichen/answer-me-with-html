@@ -324,7 +324,7 @@ ${pageCss(embedded, { diff: body.includes('class="am-codeblock am-codeblock--dif
 </style>
 </head>
 <body>
-<div class="am-toolbar"${rootCarrierAttrs(root)}>
+<div class="am-toolbar"${rootCarrierAttrs(root)} data-keys="${esc(JSON.stringify({ ...ui.keys, close: ui.close }))}">
 ${notice.button}${pick('theme', ui.theme, embedded.map((t) => [t.name, t.label[labelKey]]), meta.theme)}
 ${pick('mode', ui.modeLabel, Object.entries(ui.mode), meta.mode)}
 ${scaleButtons(ui)}
