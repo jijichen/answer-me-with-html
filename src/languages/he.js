@@ -10,6 +10,7 @@ export default {
     serif: '"Noto Serif Hebrew", "Frank Ruehl CLM", David, "Times New Roman"',
   },
   ui: {
+    keys: { title: 'קיצורי מקלדת', remark: 'הפעלה או כיבוי של מצב הערות', reply: 'הערה על הלוח הזה, או פתיחת התשובה', send: 'שמירת ההערה, או העתקת התשובה', next: 'הלוח הבא', prev: 'הלוח הקודם', jump: 'מעבר ללוח 1 עד 9', help: 'הצגה או הסתרה של רשימה זו' },
     remark: {
       button: 'סימון', need: 'בחרו תגית כדי לשמור',
       hint: 'הערה (אופציונלי)', save: 'שמירה', remove: 'הסרה', clear: 'ניקוי כל הסימונים', clearConfirm: 'לחצו שוב כדי לנקות {n} סימונים',
