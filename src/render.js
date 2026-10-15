@@ -289,7 +289,7 @@ ${pageCss(embedded, { diff: body.includes('class="am-codeblock am-codeblock--dif
 </style>
 </head>
 <body>
-<div class="am-toolbar"${rootCarrierAttrs(root)}>
+<div class="am-toolbar"${rootCarrierAttrs(root)} data-keys="${esc(JSON.stringify({ ...ui.keys, close: ui.close }))}">
 ${notice.button}${pick('theme', ui.theme, embedded.map((t) => [t.name, t.label[labelKey]]), meta.theme)}
 ${pick('mode', ui.modeLabel, Object.entries(ui.mode), meta.mode)}
 <button class="am-btn am-btn--reply" type="button" data-am="reply" data-ui="${esc(JSON.stringify({ ...ui.reply, done: ui.done, remarks: ui.remark.section, kinds: ui.remark.kinds, ...(closeAfter ? { closeAfter: { seconds: CLOSE_AFTER_SECONDS, ...ui.closeAfter } } : {}) }))}">${esc(ui.reply.button)}</button>
