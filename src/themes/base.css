@@ -138,6 +138,16 @@ code, pre, kbd { font-family: var(--font-mono); }
   border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,.25);
 }
 .am-reply::backdrop { background: rgba(0,0,0,.35); }
+.am-keys { width: min(360px, calc(100vw - 32px)); }
+.am-keys dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 12px 0 0; }
+.am-keys dt { margin: 0; }
+.am-keys dd { margin: 0; color: var(--ink-2); font-size: var(--am-fs-text); }
+.am-keys kbd {
+  display: inline-block; min-width: 1.6em; padding: 1px 6px; text-align: center; font-family: var(--font-mono); font-size: var(--am-fs-small);
+  border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; background: var(--paper);
+}
+.am-panel:focus { outline: none; }
+.am-panel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .am-reply-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
 .am-reply-head span { color: var(--ink-2); font-size: var(--am-fs-text); }
 .am-reply textarea { font-family: var(--font-mono); font-size: var(--am-fs-code); }

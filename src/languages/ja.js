@@ -12,6 +12,7 @@ export default {
     serif: '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", "Songti SC"',
   },
   ui: {
+    keys: { title: 'キーボードショートカット', remark: '注記モードの切り替え', reply: 'このパネルにコメント、または返信を開く', send: '注記を保存、または返信をコピー', next: '次のパネル', prev: '前のパネル', jump: '1〜9 番目のパネルへ移動', help: 'この一覧の表示・非表示' },
     remark: {
       button: '注記', need: '保存するにはタグを選択',
       hint: 'メモ（任意）', save: '保存', remove: '削除', clear: '注記をすべて消去', clearConfirm: 'もう一度クリックして {n} 件の注記を消去',

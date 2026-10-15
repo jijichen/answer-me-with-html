@@ -11,6 +11,7 @@ export default {
     serif: '"Songti TC", "PMingLiU", "MingLiU", "Noto Serif CJK TC", "Noto Serif TC", "Source Han Serif TC", "Songti SC"',
   },
   ui: {
+    keys: { title: '快捷鍵', remark: '開啟或關閉標註模式', reply: '評論目前面板，或開啟回覆', send: '儲存標註，或複製回覆', next: '下一個面板', prev: '上一個面板', jump: '跳到第 1 至 9 個面板', help: '顯示或隱藏本列表' },
     remark: {
       button: '標註', need: '選擇標籤後才能儲存',
       hint: '批註（可選）', save: '儲存', remove: '刪除', clear: '清除所有標註', clearConfirm: '再次點擊以清除 {n} 處標註',
