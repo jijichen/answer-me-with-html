@@ -64,6 +64,8 @@
   };
   // A mark whose block is gone from the page stays stored (it may return with `am patch`); it is neither painted nor sent.
   const marks = new Map(load().map((m) => [m.key, { key: m.key, kind: m.kind, note: String(m.note ?? '') }]));
+  // Kind and note of a popover closed without Save, by block key, until the page reloads (see open below).
+  const drafts = new Map();
   const clearBtn = document.createElement('button');
   clearBtn.type = 'button';
   clearBtn.className = 'am-btn am-btn--remark-clear';
@@ -93,6 +95,8 @@
     }
     for (const el of document.querySelectorAll('.am-mark')) unpaint(el);
     marks.clear();
+    // A draft is a remark the reader has not saved yet; Clear all drops it too, so no block reopens with an old kind.
+    drafts.clear();
     try {
       localStorage.removeItem(storeKey);
     } catch {
@@ -150,7 +154,6 @@
   document.body.append(pop);
   let opener = null;
   let anchor = null;
-  const drafts = new Map();
   let keepDraft = null;
   const close = (restoreFocus) => {
     if (pop.hidden) return;

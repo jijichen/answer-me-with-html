@@ -209,6 +209,26 @@ test('remark popover: a hint shows until a tag is picked, 1–4 pick a tag, and 
   });
 });
 
+test('remark popover: Clear all remarks also drops the drafts of popovers closed without Save', { skip: SKIP }, async () => {
+  await load();
+  const state = await evaluate(`(() => { ${PAGE_JS}
+    const pop = document.querySelector('.am-remark-pop');
+    const saved = document.querySelector('#panel-A p');
+    const drafted = document.querySelector('#panel-B p');
+    key('r');
+    saved.click(); key('1'); pop.querySelector('.am-remark-actions .am-btn').click();
+    drafted.click(); key('4'); pop.querySelector('textarea').value = 'risky';
+    key('Escape', {}, pop.querySelector('textarea'));
+    const clear = document.querySelector('.am-btn--remark-clear');
+    clear.click(); clear.click();
+    drafted.click();
+    const back = { kind: pop.querySelector('[aria-pressed="true"]')?.dataset.kind ?? '', note: pop.querySelector('textarea').value };
+    key('Escape', {}, pop.querySelector('textarea'));
+    return { marked: document.querySelectorAll('.am-mark').length, clearHidden: clear.hidden, back };
+  })()`);
+  assert.deepEqual(state, { marked: 0, clearHidden: true, back: { kind: '', note: '' } });
+});
+
 test('hotkeys: c opens the Reply once the focus has let go of a panel', { skip: SKIP }, async () => {
   await load();
   const state = await evaluate(`(() => { ${PAGE_JS}
