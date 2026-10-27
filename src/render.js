@@ -20,6 +20,7 @@ import { isolateLtrRuns } from './bidi.js';
 import { hasMath } from './math.js';
 import { cspMeta } from './csp.js';
 import { renderPanel } from './steps-panel.js';
+import { askWarnings } from './ask-warnings.js';
 
 
 export class RenderError extends Error {
@@ -67,7 +68,8 @@ export function renderDoc(source, overrides = {}, defaults = {}, { themes = BUIL
 
   // path:line spans in prose are checked against the folder code blocks read from, when the caller names one (am render, am patch).
   const refWarnings = codeDir ? checkRefs([...doc.intro, ...doc.panels.flatMap((p) => p.blocks)], { baseDir: codeDir }) : [];
-  const stats = { panels: doc.panels.length, components: {}, code: [], codeWarnings: [], refWarnings, componentWarnings: [], htmlWarnings: [], mathWarnings: [] };
+  const stats = { panels: doc.panels.length, components: {}, code: [], codeWarnings: [], refWarnings, componentWarnings: [], htmlWarnings: [], mathWarnings: [], askWarnings: askWarnings(doc) };
+  // askWarnings run whatever the style: they are about where decisions go, not about writing.
   const ui = language.ui;
   const ctx = { seq: 0, stats, errors, ui, dir: language.dir, scale, images: { baseDir, known: knownImages }, code: { baseDir: codeDir, known: knownCode } };
   // A panel-only component in the intro is an error of its own, and the block renders nothing.
