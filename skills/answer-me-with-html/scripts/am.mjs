@@ -2477,7 +2477,7 @@ function loadThemes(home, { extra } = {}) {
   return themeSet([...rest, one.theme], broken, warning);
 }
 
-// node_modules/marked/lib/marked.esm.js
+// ../../answer-me-with-html/node_modules/marked/lib/marked.esm.js
 function I() {
   return { async: false, breaks: false, extensions: null, gfm: true, hooks: null, pedantic: false, renderer: null, silent: false, tokenizer: null, walkTokens: null };
 }
@@ -5032,7 +5032,7 @@ function layout({ participants: ps, steps: steps2 }, { num, id, ui, dir = "ltr" 
   return `${svgOpen(width, height, diagramLabel(ui, "sequence", ps), dir)}${arrowDefs(id)}${actors.join("")}${body.join("")}</svg>`;
 }
 
-// node_modules/@dagrejs/dagre/dist/dagre.esm.js
+// ../../answer-me-with-html/node_modules/@dagrejs/dagre/dist/dagre.esm.js
 var Te2 = Object.defineProperty;
 var In = (e, n, t) => n in e ? Te2(e, n, { enumerable: true, configurable: true, writable: true, value: t }) : e[n] = t;
 var Sn = (e, n) => {
@@ -7787,7 +7787,8 @@ The question, one sentence
 \`\`\`
 - The first line is the question. Each option starts with * or -. Write 2 to 6 options.
 - One choice: exactly one * option. multi lets the reader pick several; * marks the ones you suggest.
-- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.`,
+- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.
+- Write every decision as an ask, one per decision, never as a table or list. Mark your pick with *, in multi too.`,
   example: "```ask\nWhich cache do we use?\n* Redis | keeps data after a restart\n- Memcached | simpler, no disk\n```",
   // The text the STE check reads: options are list items; the note reads as a second clause of the item.
   lint(text2) {
@@ -9586,6 +9587,20 @@ function cspMeta(scripts, { live = false } = {}) {
   return `<meta http-equiv="Content-Security-Policy" content="${policy}">`;
 }
 
+// src/ask-warnings.js
+var ASK_OPTION_PICKED = /^\s*\*\s+\S/;
+var MULTI_MESSAGE = "ask multi has no * option; mark the options you suggest with *";
+function askWarnings(doc2) {
+  const out = [];
+  for (const panel of doc2.panels) {
+    for (const ask of panel.blocks.filter((b) => b.type === "fence" && b.lang === "ask")) {
+      const multi = /(^|\s)multi(\s|$)/.test(ask.args ?? "");
+      if (multi && !ask.text.split("\n").some((l3) => ASK_OPTION_PICKED.test(l3))) out.push({ line: ask.line, component: "ask", message: MULTI_MESSAGE });
+    }
+  }
+  return out;
+}
+
 // src/render.js
 var RenderError = class extends Error {
   constructor(message, { line, component, example } = {}) {
@@ -9617,7 +9632,7 @@ function renderDoc(source, overrides = {}, defaults2 = {}, { themes: themes2 = B
     raiseAll(errors);
     throw new LintError(warnings);
   }
-  const stats = { panels: doc2.panels.length, components: {}, code: [], codeWarnings: [], componentWarnings: [], htmlWarnings: [], mathWarnings: [] };
+  const stats = { panels: doc2.panels.length, components: {}, code: [], codeWarnings: [], componentWarnings: [], htmlWarnings: [], mathWarnings: [], askWarnings: askWarnings(doc2) };
   const ui = language.ui;
   const ctx = { seq: 0, stats, errors, ui, dir: language.dir, scale, images: { baseDir, known: knownImages }, code: { baseDir: codeDir, known: knownCode } };
   const loose = doc2.intro.filter((b) => b.type === "fence" && COMPONENTS.get(b.lang)?.panelOnly);
@@ -12390,7 +12405,7 @@ function reportDraftError(e, src, from, ctx) {
   }
   return code;
 }
-var hasRetryWarnings = (result) => result.warnings.length > 0 || (result.stats.codeWarnings ?? []).length > 0 || (result.stats.mathWarnings ?? []).length > 0;
+var hasRetryWarnings = (result) => result.warnings.length > 0 || (result.stats.codeWarnings ?? []).length > 0 || (result.stats.mathWarnings ?? []).length > 0 || (result.stats.askWarnings ?? []).length > 0;
 function pagePath(arg, { env, io }) {
   const path = resolve4(io.cwd ?? process.cwd(), arg);
   const folders = [resolve4(amHome(env), "pages"), resolve4(tempHome(), "pages")];
@@ -12692,10 +12707,17 @@ function emit(result, file, ctx, { note: note2 = "", fallback, inPlace } = {}) {
     long.forEach((w) => print(`  L${w.line} [${w.rule}] ${w.message}`));
   }
   printComponentWarnings(result.stats.componentWarnings, print);
+  printAskWarnings(result.stats.askWarnings, print);
   printHtmlWarnings(result.stats.htmlWarnings, print);
   printMathWarnings(result.stats.mathWarnings, print);
   printWarnings(result.warnings, print, result.meta.style);
   return saved.file;
+}
+function printAskWarnings(notes = [], print) {
+  if (!notes.length) return;
+  print(`  ask ${count(notes.length, "warning")} (fix the draft and render again):`);
+  [...notes].sort((a, b) => a.line - b.line).slice(0, MAX_LISTED_WARNINGS).forEach((w) => print(`  L${w.line} [${w.component}] ${w.message}`));
+  if (notes.length > MAX_LISTED_WARNINGS) print(`  \u2026 ${notes.length - MAX_LISTED_WARNINGS} more`);
 }
 function printComponentWarnings(notes = [], print) {
   if (!notes.length) return;

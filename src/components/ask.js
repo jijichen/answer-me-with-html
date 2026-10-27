@@ -18,7 +18,8 @@ The question, one sentence
 \`\`\`
 - The first line is the question. Each option starts with * or -. Write 2 to 6 options.
 - One choice: exactly one * option. multi lets the reader pick several; * marks the ones you suggest.
-- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.`,
+- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.
+- Write every decision as an ask, one per decision, never as a table or list. Mark your pick with *, in multi too.`,
   example: '```ask\nWhich cache do we use?\n* Redis | keeps data after a restart\n- Memcached | simpler, no disk\n```',
   // The text the STE check reads: options are list items; the note reads as a second clause of the item.
   lint(text) {

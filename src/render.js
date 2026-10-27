@@ -18,6 +18,7 @@ import { renderCode, CodeError } from './code.js';
 import { isolateLtrRuns } from './bidi.js';
 import { hasMath } from './math.js';
 import { cspMeta } from './csp.js';
+import { askWarnings } from './ask-warnings.js';
 
 
 export class RenderError extends Error {
@@ -62,7 +63,8 @@ export function renderDoc(source, overrides = {}, defaults = {}, { themes = BUIL
     throw new LintError(warnings);
   }
 
-  const stats = { panels: doc.panels.length, components: {}, code: [], codeWarnings: [], componentWarnings: [], htmlWarnings: [], mathWarnings: [] };
+  const stats = { panels: doc.panels.length, components: {}, code: [], codeWarnings: [], componentWarnings: [], htmlWarnings: [], mathWarnings: [], askWarnings: askWarnings(doc) };
+  // askWarnings run whatever the style: they are about where decisions go, not about writing.
   const ui = language.ui;
   const ctx = { seq: 0, stats, errors, ui, dir: language.dir, scale, images: { baseDir, known: knownImages }, code: { baseDir: codeDir, known: knownCode } };
   // A panel-only component in the intro is an error of its own, and the block renders nothing.

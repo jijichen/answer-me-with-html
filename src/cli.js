@@ -427,7 +427,8 @@ function reportDraftError(e, src, from, ctx) {
   return code;
 }
 
-const hasRetryWarnings = (result) => result.warnings.length > 0 || (result.stats.codeWarnings ?? []).length > 0 || (result.stats.mathWarnings ?? []).length > 0;
+const hasRetryWarnings = (result) => result.warnings.length > 0 || (result.stats.codeWarnings ?? []).length > 0 || (result.stats.mathWarnings ?? []).length > 0
+  || (result.stats.askWarnings ?? []).length > 0;
 
 // The absolute path of a page, or false when arg does not name a .html file directly inside pages/ of the data directory or of the
 // temporary folder (where a page goes when the data directory is not writable). The file may be gone.
@@ -777,10 +778,19 @@ function emit(result, file, ctx, { note = '', fallback, inPlace } = {}) {
     long.forEach((w) => print(`  L${w.line} [${w.rule}] ${w.message}`));
   }
   printComponentWarnings(result.stats.componentWarnings, print);
+  printAskWarnings(result.stats.askWarnings, print);
   printHtmlWarnings(result.stats.htmlWarnings, print);
   printMathWarnings(result.stats.mathWarnings, print);
   printWarnings(result.warnings, print, result.meta.style);
   return saved.file;
+}
+
+// An ask multi with no * option. The page is written but does not open by itself.
+function printAskWarnings(notes = [], print) {
+  if (!notes.length) return;
+  print(`  ask ${count(notes.length, 'warning')} (fix the draft and render again):`);
+  [...notes].sort((a, b) => a.line - b.line).slice(0, MAX_LISTED_WARNINGS).forEach((w) => print(`  L${w.line} [${w.component}] ${w.message}`));
+  if (notes.length > MAX_LISTED_WARNINGS) print(`  … ${notes.length - MAX_LISTED_WARNINGS} more`);
 }
 
 // What a component noticed in its own block (a group box that would be empty after a change). The page is still written.
