@@ -106,7 +106,8 @@ The question, one sentence
 - One choice: exactly one * option. multi lets the reader pick several; * marks the ones you suggest.
 - An option may carry one preview: indent a ::: block under it. Any component works, plus html and svg. Leave it out when a picture does not help.
 - cards lays the options out in a grid, for a landing-page choice. Each preview becomes the card's canvas.
-- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.`,
+- Place the ask in the panel whose content the answer changes. The Reply button turns the answers into one reply.
+- Write every decision as an ask, one per decision, never as a table or list. Mark your pick with *, in multi too.`,
   example: '```ask\nWhich cache do we use?\n* Redis | keeps data after a restart\n- Memcached | simpler, no disk\n```',
   // The text the STE check reads: options are list items; the note reads as a second clause of the item. A preview is a picture, not prose.
   lint(text) {
