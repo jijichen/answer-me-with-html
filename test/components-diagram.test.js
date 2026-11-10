@@ -19,6 +19,20 @@ test('smoothPath: two points give a straight line, more give a smooth curve', ()
   assert.match(smoothPath([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }]), /^M0,0 L5,0 Q10,0 10,5 L10,10$/);
 });
 
+// ── flow: top-to-bottom alternative ──
+test('flow: a wide sideways flow carries a top-to-bottom layout in a template; a short one, a TB one and a video scene do not', () => {
+  const chain = 'Client -> FrontendRequestRouterService -> AuthenticationTokenValidator -> SessionLookupRepository -> UserProfileAggregationLayer -> ResponseSerializer';
+  const wide = render('flow', chain, 'LR');
+  assert.match(wide, /^<figure class="am-diagram am-flow"><svg [^]*<\/svg><template class="am-alt-tb"><svg [^]*<\/svg><\/template><\/figure>$/);
+  // The template is the same graph laid out top to bottom: narrower than the sideways one.
+  const [lr, tb] = [...wide.matchAll(/<svg viewBox="0 0 ([\d.]+) /g)].map((m) => Number(m[1]));
+  assert.ok(tb < lr, `${tb} < ${lr}`);
+  assert.match(render('flow', chain, 'RL'), /am-alt-tb/);
+  assert.doesNotMatch(render('flow', 'A -> B', 'LR'), /am-alt-tb/);
+  assert.doesNotMatch(render('flow', chain), /am-alt-tb/);
+  assert.doesNotMatch(COMPONENTS.get('flow').render(chain, { ...ctx('LR'), video: true }), /am-alt-tb/);
+});
+
 // ── sequence ──
 test('parseSequence: participants in order of appearance, solid/dashed lines, self-calls, notes', () => {
   const m = parseSequence('A -> B: 请求\nB --> A: 响应\nB -> B: 校验\nnote A, B: 建立连接');

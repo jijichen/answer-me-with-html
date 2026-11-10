@@ -771,10 +771,12 @@ test('e2e: diagram expand button opens lightbox and Escape closes it', { skip: S
 
 test('e2e: the expand button stays in view when a wide diagram scrolls sideways', { skip: SKIP, timeout: 60000 }, async () => {
   if (!cdp) await launch();
-  const tcp = pages.find((x) => x.name === 'tcp');
-  assert.ok(tcp, 'tcp page with diagram');
-  await open(tcp.file, PHONE);
-  await waitFor("getComputedStyle(document.querySelector('.am-grid')).display === 'grid'", `tcp to use the grid at ${PHONE}px`);
+  // A sequence with many participants has no narrower layout to switch to (a wide sideways flow turns top to bottom), so it scrolls on a phone.
+  const { html } = renderDoc(`---\ntitle: Wide sequence\nlang: en\n---\n## A Calls\n\`\`\`sequence\n${['Client', 'Gateway', 'Auth', 'Service', 'Cache', 'Database'].map((p, i, all) => (i ? `${all[i - 1]} -> ${p}: call` : '')).filter(Boolean).join('\n')}\n\`\`\`\n\n## B Notes\nShort text.\n`);
+  const file = join(tmp, 'wide-sequence.html');
+  writeFileSync(file, html);
+  await open(file, PHONE);
+  await waitFor("getComputedStyle(document.querySelector('.am-grid')).display === 'grid'", `the page to use the grid at ${PHONE}px`);
 
   const inView = `(() => {
     const d = [...document.querySelectorAll('.am-diagram')].find((el) => el.scrollWidth > el.clientWidth);
