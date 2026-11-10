@@ -15,6 +15,28 @@ const floorDiagrams = () => {
     if (width > 0) svg.style.minWidth = `${Math.floor(width * MIN_SCALE)}px`;
   }
 };
+// A wide sideways flow carries a top-to-bottom layout in a template (src/components/flow.js). When the sideways one would drop under the
+// floor and the top-to-bottom one fits at the floor or larger, they swap; the template keeps the sideways one. This runs once, at load,
+// with the width the figure has before the sheet is planned. The template svg has not had the reader's text size applied (page.js), so
+// it gets the same scale as the svg it replaces.
+const boxWidth = (svg) => Number(svg?.getAttribute('viewBox')?.split(/\s+/)[2]) || 0;
+for (const alt of document.querySelectorAll('.am-diagram > template.am-alt-tb')) {
+  const fig = alt.parentElement;
+  const svg = fig.querySelector(':scope > svg');
+  const tb = alt.content.querySelector('svg');
+  const room = fig.clientWidth;
+  const scale = Number(svg?.getAttribute('width')) / boxWidth(svg);
+  if (!(room > 0 && scale > 0 && boxWidth(tb) > 0)) continue;
+  if (boxWidth(svg) * scale * MIN_SCALE <= room || boxWidth(tb) * scale * MIN_SCALE > room) continue;
+  const swapped = tb.cloneNode(true);
+  if (scale !== 1) {
+    const box = swapped.getAttribute('viewBox').split(/\s+/).map(Number);
+    swapped.setAttribute('width', String(Math.ceil(box[2] * scale)));
+    swapped.setAttribute('height', String(Math.ceil(box[3] * scale)));
+  }
+  alt.content.replaceChildren(svg.cloneNode(true));
+  svg.replaceWith(swapped);
+}
 floorDiagrams();
 addEventListener('am-scale', floorDiagrams);
 

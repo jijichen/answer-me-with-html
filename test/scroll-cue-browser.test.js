@@ -148,3 +148,21 @@ test('scroll cue: a wide diagram on a right-to-left page starts at the right and
   })()`);
   assert.deepEqual(state, { atStart: ['am-more-left'], atEnd: ['am-more-right'], table: 0 });
 });
+
+test('scroll cue: a wide sideways flow that would scroll switches to its top-to-bottom layout when that one fits', { skip: SKIP }, async () => {
+  await load(page('wide', WIDE), 700);
+  const narrow = await evaluate(`(() => {
+    const fig = document.querySelector('#panel-A .am-diagram');
+    const shown = fig.querySelector(':scope > svg').getAttribute('viewBox').split(' ').map(Number);
+    const kept = fig.querySelector('template.am-alt-tb').content.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
+    return { tall: shown[3] > shown[2], keptWide: kept[2] > kept[3], scrolls: fig.scrollWidth > fig.clientWidth + 1 };
+  })()`);
+  assert.deepEqual(narrow, { tall: true, keptWide: true, scrolls: false });
+  // A window wide enough for the sideways layout at the floor keeps it.
+  await load(page('wide', WIDE), 2400);
+  const wide = await evaluate(`(() => {
+    const box = document.querySelector('#panel-A .am-diagram > svg').getAttribute('viewBox').split(' ').map(Number);
+    return box[2] > box[3];
+  })()`);
+  assert.equal(wide, true);
+});

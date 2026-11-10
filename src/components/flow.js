@@ -81,10 +81,17 @@ Client -> Gateway
     const model = parseFlow(text);
     model.warnings.forEach((w) => warn?.(w));
     const flowDir = (args.match(/\b(TB|LR|BT|RL)\b/i)?.[1] ?? 'TB').toUpperCase();
-    const html = `<figure class="am-diagram am-flow">${layout(model, DIRS.has(flowDir) ? flowDir : 'TB', uid(), ui, pageDir, video ? undefined : warn)}</figure>`;
+    const main = layout(model, DIRS.has(flowDir) ? flowDir : 'TB', uid(), ui, pageDir, video ? undefined : warn);
+    // A wide sideways flow also carries a top-to-bottom layout; the page shows it when the sideways one would not fit at a readable size
+    // (src/runtime/layout-dom.js). A video scene has a fixed stage, so it keeps the one the author wrote.
+    const wide = !video && (flowDir === 'LR' || flowDir === 'RL') && Number(main.match(/<svg[^>]*\swidth="([\d.]+)"/)?.[1]) > WIDE_FLOW;
+    const alt = wide ? `<template class="am-alt-tb">${layout(model, 'TB', uid(), ui, pageDir)}</template>` : '';
+    const html = `<figure class="am-diagram am-flow">${main}${alt}</figure>`;
     return withDelta(html, [...model.nodes.values(), ...model.edges, ...model.groups].map((x) => x.state ?? null), { ui, video });
   },
 };
+
+const WIDE_FLOW = 900; // px at scale 1: a wider sideways flow gets a top-to-bottom alternative
 
 export function parseFlow(text) {
   const nodes = new Map();
