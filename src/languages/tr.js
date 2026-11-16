@@ -5,6 +5,7 @@ export default {
   language: 'tr',
   voice: { say: 'tr_TR', espeak: 'tr' },
   ui: {
+    keys: { title: 'Klavye kısayolları', remark: 'İşaretleme modunu aç veya kapat', reply: 'Bu panele yorum yaz veya yanıtı aç', send: 'İşareti kaydet veya yanıtı kopyala', next: 'Sonraki panel', prev: 'Önceki panel', jump: '1 ile 9 arasındaki panele git', help: 'Bu listeyi göster veya gizle' },
     remark: {
       button: 'İşaretle', need: 'Kaydetmek için bir etiket seçin',
       hint: 'İsteğe bağlı not', save: 'Kaydet', remove: 'Kaldır', clear: 'Tüm işaretleri temizle', clearConfirm: '{n} işareti temizlemek için tekrar tıklayın',
