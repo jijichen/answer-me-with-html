@@ -2179,6 +2179,7 @@ var tr_default = {
   language: "tr",
   voice: { say: "tr_TR", espeak: "tr" },
   ui: {
+    keys: { title: "Klavye k\u0131sayollar\u0131", remark: "\u0130\u015Faretleme modunu a\xE7 veya kapat", reply: "Bu panele yorum yaz veya yan\u0131t\u0131 a\xE7", send: "\u0130\u015Fareti kaydet veya yan\u0131t\u0131 kopyala", next: "Sonraki panel", prev: "\xD6nceki panel", jump: "1 ile 9 aras\u0131ndaki panele git", help: "Bu listeyi g\xF6ster veya gizle" },
     remark: {
       button: "\u0130\u015Faretle",
       need: "Kaydetmek i\xE7in bir etiket se\xE7in",
