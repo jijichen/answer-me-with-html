@@ -293,6 +293,31 @@ test('flow: a Mermaid node ID cut by a colon warns when it is the only occurrenc
   assert.match(render('flow', 'A[v2rayN: x] -> B'), /^<figure class="am-diagram am-flow">/);
 });
 
+test('flow: two nodes that differ only in the English gloss warn, with the later line', () => {
+  const m = parseFlow('股市下跌 (stocks fall) -> 资管费下跌 (asset-management fees fall)\n资管费下跌 (fees fall) -> PCE 通胀下行 (PCE inflation falls)');
+  assert.deepEqual(m.warnings.map((w) => w.line), [2]);
+  assert.match(m.warnings[0].message, /"资管费下跌 \(fees fall\)" and "资管费下跌 \(asset-management fees fall\)" look like the same node written two ways/);
+});
+
+test('flow: the same node written the same way, and genuinely different nodes, do not warn', () => {
+  for (const text of [
+    'A -> B\nC -> B',
+    '利率上升 (rates rise) -> A\n利率下降 (rates fall) -> B',
+    'A -> B (x)\nC -> D (y)',
+  ]) {
+    assert.deepEqual(parseFlow(text).warnings, [], text);
+  }
+});
+
+test('flow: renaming a node across a change is not a duplicate', () => {
+  const m = parseFlow('- 资管费下跌 (fees fall) -> B\n+ 资管费下跌 (asset-management fees fall) -> B');
+  assert.deepEqual(m.warnings, []);
+});
+
+test('flow: a duplicate-gloss warning still renders the page', () => {
+  assert.match(render('flow', 'A -> 资管费下跌 (asset-management fees fall)\n资管费下跌 (fees fall) -> B'), /^<figure class="am-diagram am-flow">/);
+});
+
 test('flow: an array index label gets one warning and still renders', () => {
   const m = parseFlow('Gateway (HTTPS) -> array[0]');
   assert.equal(m.warnings.length, 1);
