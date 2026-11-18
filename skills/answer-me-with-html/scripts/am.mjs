@@ -7792,7 +7792,7 @@ function parseFlow(text2) {
     const state = nodeState(n);
     return [id, state ? { ...n, state } : n];
   }));
-  return { nodes: settled, edges, groups, warnings: [...groupWarnings(groups, settled), ...mermaidIdWarnings(settled)] };
+  return { nodes: settled, edges, groups, warnings: [...groupWarnings(groups, settled), ...mermaidIdWarnings(settled), ...duplicateLabelWarnings(settled)] };
 }
 function checkMermaidIds(nodes) {
   for (const n of nodes.values()) {
@@ -7814,6 +7814,27 @@ function mermaidIdWarnings(nodes) {
     notes.push({
       line: n.line,
       message: `"${n.label}" looks like a Mermaid node ID with its text; this block has no node IDs, so the box shows "${n.label}". If you meant the text, write it alone${rewriteOf(m[2])}`
+    });
+  }
+  return notes;
+}
+function duplicateLabelWarnings(nodes) {
+  const stem = (label) => label.replace(/\s*\([^()]*\)\s*$/, "").replace(/\s+/g, " ").trim();
+  const seen = /* @__PURE__ */ new Map();
+  const notes = [];
+  for (const n of nodes.values()) {
+    const s = stem(n.label);
+    if (!s) continue;
+    const prev = seen.get(s);
+    if (!prev) {
+      seen.set(s, n);
+      continue;
+    }
+    if (prev.label === n.label) continue;
+    if (!(prev.before && n.before || prev.after && n.after)) continue;
+    notes.push({
+      line: n.line,
+      message: `"${n.label}" and "${prev.label}" look like the same node written two ways, so this block draws two boxes for one idea; write the node the same way on both lines`
     });
   }
   return notes;
