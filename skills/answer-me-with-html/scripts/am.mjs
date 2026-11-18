@@ -11066,13 +11066,25 @@ function cspMeta(scripts, { live = false } = {}) {
 
 // src/ask-warnings.js
 var ASK_OPTION_PICKED = /^\s*\*\s+\S/;
+var hasPick = (text2) => {
+  const lines = text2.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const close = previewEnd(lines, i);
+    if (close !== -1) {
+      i = close;
+      continue;
+    }
+    if (ASK_OPTION_PICKED.test(lines[i])) return true;
+  }
+  return false;
+};
 var MULTI_MESSAGE = "ask multi has no * option; mark the options you suggest with *";
 function askWarnings(doc2) {
   const out = [];
   for (const panel of doc2.panels) {
     for (const ask of panel.blocks.filter((b) => b.type === "fence" && b.lang === "ask")) {
       const multi = /(^|\s)multi(\s|$)/.test(ask.args ?? "");
-      if (multi && !ask.text.split("\n").some((l3) => ASK_OPTION_PICKED.test(l3))) out.push({ line: ask.line, component: "ask", message: MULTI_MESSAGE });
+      if (multi && !hasPick(ask.text)) out.push({ line: ask.line, component: "ask", message: MULTI_MESSAGE });
     }
   }
   return out;

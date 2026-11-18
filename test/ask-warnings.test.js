@@ -23,6 +23,12 @@ test('ask warnings: ask multi with only - options warns at its fence line; with 
   assert.deepEqual(warningsOf('## A Logs\n```ask multi\nWhat do we log?\n* Retry\n- Give up\n```\n'), []);
 });
 
+test('ask warnings: a * line inside an option preview is not a suggested option', () => {
+  const preview = (inner) => `## A Cache\n\`\`\`ask multi\nWhich caches?\n- Redis | keeps data\n  :::kv\n  ${inner}\n  :::\n- Memcached | simple\n\`\`\`\n`;
+  assert.deepEqual(warningsOf(preview('* wide cell: a value')), [{ line: 6, component: 'ask', message: MULTI_MESSAGE }]);
+  assert.deepEqual(warningsOf(preview('* wide cell: a value').replace('- Memcached', '* Memcached')), []);
+});
+
 test('ask warnings: a single-choice ask with no * stays a hard error with a correct example, not a warning', () => {
   assert.throws(() => renderDoc(`${FM}## A Cache\n\`\`\`ask\nWhich cache?\n- Redis\n- Memcached\n\`\`\`\n`), (err) => err instanceof RenderError
     && err.component === 'ask' && /mark exactly one option with \* as your suggestion \(found 0\)/.test(err.message) && Boolean(err.example));
