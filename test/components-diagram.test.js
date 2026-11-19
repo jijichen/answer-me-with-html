@@ -328,6 +328,26 @@ test('flow: renaming a node across a change is not a duplicate', () => {
   assert.deepEqual(m.warnings, []);
 });
 
+test('flow: a duplicate between two later nodes still warns when the first node shares no view with them', () => {
+  const m = parseFlow('- A (x) -> B\n+ A (y) -> B\n+ A (z) -> C');
+  assert.deepEqual(m.warnings.map((w) => w.line), [3]);
+  assert.match(m.warnings[0].message, /"A \(z\)" and "A \(y\)" look like the same node written two ways/);
+});
+
+test('flow: a duplicate gloss in full-width parens warns, including mixed widths', () => {
+  for (const text of [
+    '资管费下跌（asset-management fees fall） -> B\n资管费下跌（fees fall） -> C',
+    '资管费下跌（fees fall） -> B\n资管费下跌 (asset-management fees fall) -> C',
+  ]) {
+    assert.equal(parseFlow(text).warnings.length, 1, text);
+  }
+});
+
+test('flow: a node in a context line and its gloss twin on a removed line still share the before view', () => {
+  const m = parseFlow('A (x) -> B\n- A (y) -> C');
+  assert.deepEqual(m.warnings.map((w) => w.line), [2]);
+});
+
 test('flow: a duplicate-gloss warning still renders the page', () => {
   assert.match(render('flow', 'A -> 资管费下跌 (asset-management fees fall)\n资管费下跌 (fees fall) -> B'), /^<figure class="am-diagram am-flow">/);
 });
