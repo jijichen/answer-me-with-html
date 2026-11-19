@@ -8027,23 +8027,22 @@ function mermaidIdWarnings(nodes) {
   return notes;
 }
 function duplicateLabelWarnings(nodes) {
-  const stem = (label) => label.replace(/\s*\([^()]*\)\s*$/, "").replace(/\s+/g, " ").trim();
+  const stem = (label) => label.replace(/\s*[(（][^()（）]*[)）]\s*$/, "").replace(/\s+/g, " ").trim();
   const seen = /* @__PURE__ */ new Map();
   const notes = [];
   for (const n of nodes.values()) {
     const s = stem(n.label);
     if (!s) continue;
-    const prev = seen.get(s);
-    if (!prev) {
-      seen.set(s, n);
-      continue;
+    const group = seen.get(s) ?? [];
+    const prev = group.find((p) => p.before && n.before || p.after && n.after);
+    if (prev) {
+      notes.push({
+        line: n.line,
+        message: `"${n.label}" and "${prev.label}" look like the same node written two ways, so this block draws two boxes for one idea; write the node the same way on both lines`
+      });
     }
-    if (prev.label === n.label) continue;
-    if (!(prev.before && n.before || prev.after && n.after)) continue;
-    notes.push({
-      line: n.line,
-      message: `"${n.label}" and "${prev.label}" look like the same node written two ways, so this block draws two boxes for one idea; write the node the same way on both lines`
-    });
+    group.push(n);
+    seen.set(s, group);
   }
   return notes;
 }

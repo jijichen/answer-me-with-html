@@ -176,22 +176,27 @@ function mermaidIdWarnings(nodes) {
 
 // Two nodes that differ only in the trailing parenthetical gloss are one idea written two ways: the diagram draws
 // two boxes and no link can join them. A rename across a change is not a duplicate: it only warns when the two
-// nodes share a view, so one view would draw both boxes.
+// nodes share a view, so one view would draw both boxes. The gloss may use full-width parens, so the stem strips
+// either width (mixed pairs are harmless here).
 function duplicateLabelWarnings(nodes) {
-  const stem = (label) => label.replace(/\s*\([^()]*\)\s*$/, '').replace(/\s+/g, ' ').trim();
+  const stem = (label) => label.replace(/\s*[(（][^()（）]*[)）]\s*$/, '').replace(/\s+/g, ' ').trim();
   const seen = new Map();
   const notes = [];
   for (const n of nodes.values()) {
     const s = stem(n.label);
     if (!s) continue;
-    const prev = seen.get(s);
-    if (!prev) { seen.set(s, n); continue; }
-    if (prev.label === n.label) continue;
-    if (!((prev.before && n.before) || (prev.after && n.after))) continue;
-    notes.push({
-      line: n.line,
-      message: `"${n.label}" and "${prev.label}" look like the same node written two ways, so this block draws two boxes for one idea; write the node the same way on both lines`,
-    });
+    // One entry per stem is not enough: a duplicate can hide between two later nodes when the first shares no
+    // view with them, so each node is compared with every earlier node of the same stem.
+    const group = seen.get(s) ?? [];
+    const prev = group.find((p) => (p.before && n.before) || (p.after && n.after));
+    if (prev) {
+      notes.push({
+        line: n.line,
+        message: `"${n.label}" and "${prev.label}" look like the same node written two ways, so this block draws two boxes for one idea; write the node the same way on both lines`,
+      });
+    }
+    group.push(n);
+    seen.set(s, group);
   }
   return notes;
 }
