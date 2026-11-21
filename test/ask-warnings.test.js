@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { renderDoc, RenderError } from '../src/render.js';
 import { main } from '../src/cli.js';
-import { MULTI_MESSAGE } from '../src/ask-warnings.js';
+import { askWarnings, MULTI_MESSAGE } from '../src/ask-warnings.js';
 
 const FM = '---\ntitle: Report\nlang: en\n---\n';
 const warningsOf = (body) => renderDoc(`${FM}${body}`).stats.askWarnings;
@@ -21,6 +21,12 @@ test('ask warnings: a table or list of choices outside an ask does not warn', ()
 test('ask warnings: ask multi with only - options warns at its fence line; with one * it does not', () => {
   assert.deepEqual(warningsOf('## A Logs\n```ask multi\nWhat do we log?\n- Retry\n- Give up\n```\n'), [{ line: 6, component: 'ask', message: MULTI_MESSAGE }]);
   assert.deepEqual(warningsOf('## A Logs\n```ask multi\nWhat do we log?\n* Retry\n- Give up\n```\n'), []);
+});
+
+test('ask warnings: an ask the component rejects counts as picked, since the render reports it as an error', () => {
+  const doc = (text) => ({ panels: [{ blocks: [{ type: 'fence', lang: 'ask', args: 'multi', line: 3, text }] }] });
+  assert.deepEqual(askWarnings(doc('Which caches?\n- Redis | keeps data\nnot an option')), []);
+  assert.deepEqual(askWarnings(doc('Which caches?\n- Redis | keeps data\n- Memcached')), [{ line: 3, component: 'ask', message: MULTI_MESSAGE }]);
 });
 
 test('ask warnings: a * line inside an option preview is not a suggested option', () => {
