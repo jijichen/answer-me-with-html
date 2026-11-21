@@ -1,7 +1,7 @@
 // Keyboard shortcuts: r remark mode, c comment on the current panel (or the Reply), j / k next / previous panel, 1–9 jump to a panel,
 // ? the list of keys, j / k past the ends, the current digit again or Esc let go of the panel, Ctrl / Cmd + Enter save the open remark (or copy the reply).
 // The keys press the page's own buttons, so remark.js and reply.js stay the only owners of what those buttons do.
-// A letter never fires while the reader types (a comment box, a remark note, a select), holds Ctrl / Cmd / Alt, or has a dialog open.
+// A letter never fires while the reader types (a comment box, a remark note, a select), holds Ctrl / Cmd / Alt, or has a dialog, the lightbox or the Export menu open.
 const toolbar = document.querySelector('.am-toolbar');
 const panels = [...document.querySelectorAll('.am-panel')];
 if (toolbar?.dataset.keys) {
@@ -77,7 +77,8 @@ if (toolbar?.dataset.keys) {
 
   const typing = (el) => el instanceof Element && el.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), .am-remark-pop');
   const blocked = () => [...document.querySelectorAll('dialog[open]')].some((d) => d !== help)
-    || Boolean(document.querySelector('.am-lightbox:not([hidden])'));
+    || Boolean(document.querySelector('.am-lightbox:not([hidden])'))
+    || Boolean(document.querySelector('[data-am="export"][aria-expanded="true"]'));
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing && !e.defaultPrevented) { e.preventDefault(); return send(); }
