@@ -205,3 +205,23 @@ test('hotkeys: Esc lets go of the panel, and Esc in a Comment box first goes bac
   })()`);
   assert.deepEqual(state, { plain: '', fromBox: 'panel-B', after: '', reply: true });
 });
+
+test('hotkeys: no key acts while the Export menu is open, and Esc there closes only the menu', { skip: SKIP }, async () => {
+  await load();
+  const before = await evaluate(`(async () => { ${PAGE_JS}
+    const btn = document.querySelector('[data-am="export"]');
+    const inMenu = () => Boolean(document.activeElement?.closest('#am-export'));
+    key('2'); btn.click(); await new Promise((r) => setTimeout(r, 50));
+    const opened = btn.getAttribute('aria-expanded') === 'true'; const focusIn = inMenu();
+    key('j'); key('3'); key('r');
+    return { opened, focusIn, stayed: inMenu(), remark: remarkOn() };
+  })()`);
+  // A native popover closes only on a trusted Esc, so this one goes through the browser, not dispatchEvent.
+  for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+  const after = await evaluate(`(async () => { ${PAGE_JS}
+    await new Promise((r) => setTimeout(r, 50));
+    return { closed: document.querySelector('[data-am="export"]').getAttribute('aria-expanded') !== 'true', errors: window.__errors };
+  })()`);
+  assert.deepEqual(before, { opened: true, focusIn: true, stayed: true, remark: false });
+  assert.deepEqual(after, { closed: true, errors: [] });
+});
