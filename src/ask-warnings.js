@@ -1,20 +1,17 @@
 // An ask multi with no * option shows the reader no suggestion. It warns so the draft gets fixed before the reader sees it.
 // Always on: this is not a writing-style check. A single-choice ask with no * is an error in the ask component itself.
 
-import { previewEnd } from './components/ask.js';
+import { readAsk } from './components/ask.js';
 
-const ASK_OPTION_PICKED = /^\s*\*\s+\S/;
-
-// True when an option line outside the previews starts with *. A preview (an indented ::: block under an option) holds another
-// component, whose own lines may start with * (a kv wide cell, a list item), so it is skipped up to the close previewEnd finds.
+// True when the ask marks an option with *, read by the ask component's own parser, so the warning follows its syntax: a * line
+// inside a preview is the preview's content, not an option. An ask the parser rejects counts as picked: the render already
+// reports it as an error, and a second message about it would only add noise.
 const hasPick = (text) => {
-  const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const close = previewEnd(lines, i);
-    if (close !== -1) { i = close; continue; }
-    if (ASK_OPTION_PICKED.test(lines[i])) return true;
+  try {
+    return readAsk(text).options.some((o) => o.suggested);
+  } catch {
+    return true;
   }
-  return false;
 };
 
 export const MULTI_MESSAGE = 'ask multi has no * option; mark the options you suggest with *';

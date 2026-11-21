@@ -11481,18 +11481,12 @@ function checkSteps(steps2, { link, hasDiagram, codeHtml }, report) {
 }
 
 // src/ask-warnings.js
-var ASK_OPTION_PICKED = /^\s*\*\s+\S/;
 var hasPick = (text2) => {
-  const lines = text2.split("\n");
-  for (let i = 0; i < lines.length; i++) {
-    const close = previewEnd(lines, i);
-    if (close !== -1) {
-      i = close;
-      continue;
-    }
-    if (ASK_OPTION_PICKED.test(lines[i])) return true;
+  try {
+    return readAsk(text2).options.some((o) => o.suggested);
+  } catch {
+    return true;
   }
-  return false;
 };
 var MULTI_MESSAGE = "ask multi has no * option; mark the options you suggest with *";
 function askWarnings(doc2) {
