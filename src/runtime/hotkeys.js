@@ -88,6 +88,8 @@ if (toolbar?.dataset.keys) {
       const i = panels.indexOf(panel);
       if (i >= 0) { e.preventDefault(); return go(i); }
     }
+    // Esc inside a steps block clears its step (src/runtime/steps.js); it does not also let go of the panel.
+    if (e.key === 'Escape' && e.target instanceof Element && e.target.closest('[data-steps]')) return;
     if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
     if (e.key === '?') { e.preventDefault(); return showHelp(); }
     if (blocked() || help?.open) return;
