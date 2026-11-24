@@ -90,7 +90,8 @@ export function makeLink(steps, ui) {
 }
 
 // A drawing whose items are buttons is a group: role="img" would hide them from a screen reader. The aria-label stays.
-export const groupSvg = (html) => html.replace(/(<svg [^>]*?) role="img"/, '$1 role="group"');
+// A wide flow's top-to-bottom alternative (in a template) is a drawing of the same buttons, so every svg in it becomes a group.
+export const groupSvg = (html) => html.replace(/(<svg [^>]*?) role="img"/g, '$1 role="group"');
 
 // The number on a diagram item: a disc on the item's corner in svg, a small tag in a tree. The page hides it while it is live.
 export const stepBadgeSvg = (n, x, y) => `<g class="am-step-badge" transform="translate(${f(x)},${f(y)})"><circle r="8"/><text text-anchor="middle" dominant-baseline="central">${n}</text></g>`;

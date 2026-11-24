@@ -93,6 +93,19 @@ Client -> Gateway
   },
 };
 
+// A link that answers like the steps block's own but leaves its match counts and seen labels alone (src/steps.js makeLink).
+const quietLink = (link) => ({
+  node(label) {
+    const { matches, seen } = link;
+    const [counts, asked] = [[...matches], seen.length];
+    const step = link.node(label);
+    matches.splice(0, matches.length, ...counts);
+    seen.length = asked;
+    return step;
+  },
+  ends: (from, to) => link.ends(from, to),
+});
+
 const WIDE_FLOW = 900; // px at scale 1: a wider sideways flow gets a top-to-bottom alternative
 
 export function parseFlow(text) {
