@@ -488,3 +488,17 @@ test('every language has a hint for explain mode', async () => {
     assert.ok(l.ui.steps.hintExplain && l.ui.steps.hintExplain !== l.ui.steps.hint, lang);
   }
 });
+
+test('a wide sideways flow: its top-to-bottom alternative carries the same step buttons, and an item still counts once', () => {
+  const chain = 'Intake request -> Validate payload -> Enrich with defaults -> Score candidates -> Rank results -> Render response -> Cache response -> Send to client';
+  const steps = '```steps\nIntake request: The request arrives.\nRank results: Results are ordered.\n```';
+  const html = renderDoc(draft(`\`\`\`flow LR\n${chain}\n\`\`\``, steps)).html;
+  const alt = html.match(/<template class="am-alt-tb">([^]*?)<\/template>/)?.[1];
+  assert.ok(alt, 'the wide flow carries a top-to-bottom alternative');
+  const main = html.slice(0, html.indexOf('<template class="am-alt-tb">'));
+  for (const part of [main, alt]) {
+    assert.equal(part.match(/<g class="am-node[^>]* data-link="/g)?.length, 2);
+    assert.match(part, /<svg [^>]*role="group"/);
+  }
+  assert.equal((alt.match(/data-ends="/g) ?? []).length, (main.match(/data-ends="/g) ?? []).length);
+});

@@ -5549,7 +5549,7 @@ function makeLink(steps2, ui) {
     }
   };
 }
-var groupSvg = (html) => html.replace(/(<svg [^>]*?) role="img"/, '$1 role="group"');
+var groupSvg = (html) => html.replace(/(<svg [^>]*?) role="img"/g, '$1 role="group"');
 var stepBadgeSvg = (n, x2, y2) => `<g class="am-step-badge" transform="translate(${f(x2)},${f(y2)})"><circle r="8"/><text text-anchor="middle" dominant-baseline="central">${n}</text></g>`;
 var stepBadgeHtml = (n) => `<span class="am-step-badge" aria-hidden="true">${n}</span>`;
 function markCodeLines(html, steps2) {
@@ -7968,6 +7968,17 @@ Client -> Gateway
     return withDelta(html, [...model.nodes.values(), ...model.edges, ...model.groups].map((x2) => x2.state ?? null), { ui, video });
   }
 };
+var quietLink = (link) => ({
+  node(label) {
+    const { matches, seen } = link;
+    const [counts, asked] = [[...matches], seen.length];
+    const step = link.node(label);
+    matches.splice(0, matches.length, ...counts);
+    seen.length = asked;
+    return step;
+  },
+  ends: (from, to) => link.ends(from, to)
+});
 var WIDE_FLOW = 900;
 function parseFlow(text2) {
   const nodes = /* @__PURE__ */ new Map();
