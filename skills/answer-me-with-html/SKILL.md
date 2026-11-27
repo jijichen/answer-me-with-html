@@ -148,7 +148,7 @@ Write a component as a fenced code block (```` ```flow ```` … ```` ``` ````); 
 
 | Shape of the information | Component | Minimal syntax |
 |---|---|---|
-| What connects to what, architecture, decision branches | `flow [LR]` | `A -> B: label`, `A --> C` dashed, `A -> B & C` fan-out, `{decision?}` `(start)` `[(database)]`, `*emphasis`, `group name: A, B`, no node IDs: `{OK?}`, not `B{OK?}` |
+| What connects to what, architecture, decision branches | `flow [LR]` | `A -> B: label`, `A --> C` dashed, `A -> B & C` fan-out, `{decision?}` `(start)` `[(database)]`, `*emphasis`, `group name: A, B`, no node IDs: `{OK?}`, not `B{OK?}`, repeat a node's exact label on every line |
 | A state machine: states and the events between them, a connection lifecycle, a protocol handshake | `state [LR]` | `[*] -> Idle`, `Idle -> Open: connect()`, `Open -> Open: retransmit` (self-transition), `Open -> [*]` |
 | A data model: entities, their columns and the relations between them | `er [LR]` | entity at column 0, indented `name [type] [PK\|FK\|UK]` fields, `user_id FK -> User`, `User 1--* Order: places` |
 | Classes, code interfaces and their relationships | `class [LR]` | declare `class User` and `interface Store`, indent `+id: string` or `+save(): void`, then `User ..> Store: uses` |

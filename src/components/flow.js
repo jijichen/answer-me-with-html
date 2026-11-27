@@ -61,7 +61,7 @@ A -> B & C                    ← fan-out
 *Key node                     ← * prefix highlights
 group Group name: B, C        ← draw a group box around nodes
 \`\`\`
-- The text inside the brackets is the node's identity; later lines can refer to the node by that text alone. The default direction is TB (top to bottom).
+- The text inside the brackets is the node's identity; repeat that exact text on every line for the same node (including any parenthetical gloss). The default direction is TB (top to bottom).
 - Mermaid node IDs are not accepted: write the text alone, [Start] rather than A[Start], and refer to it later as Start.
 - When an edge would run through another node or through another edge's label, \`am render\` warns with the draft line; the page is still written. Follow the fix in the warning: usually the other direction, or a split diagram.
 - Change markers show what a plan adds, removes and changes. A line can start with + (added), - (removed) or ~ (changed), followed by a space:
